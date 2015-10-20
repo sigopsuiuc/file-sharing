@@ -16,9 +16,26 @@ This directory contains the server code for authentication. The server uses Djan
 * <s>receive information from requests and store the information in the database for future reference</s>
 * set up authentication procedures.
 * send peer list to peer and receive list from peer
-
 ###ISSUES:
 * need research on embeded authentication method of Django and mysql database
+
+sharing_client
+-----------------------------------------
+
+#####updated by Atul-Nambudiri
+
+This directory contains the file syncing code
+
+####implemented features:
+* Sync a whole directory
+* Copy a directory when a new client comes up
+
+###HowTo:
+* There are two python scripts, server.py and client.py. Server.py represents an existing client with fully synced files, while client.py is a newly spun up client. 
+* Put any files that you would like to sync in the in/ folder. You can have subfolders
+* Run server.py
+* In a seperate terminal, run client.py
+* The client will request all the files in servers synced folder. It will save the files into the out/ directory
 
 
 testing
