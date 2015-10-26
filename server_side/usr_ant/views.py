@@ -2,6 +2,8 @@ from django.shortcuts import render
 from .forms import UserInfo
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from .models import Peer
+import json
 # Create your views here.
 
 def peerlist(request):
@@ -15,11 +17,24 @@ def peerlist(request):
             print 'client name is: '+ name
             print 'client password is: '+ password
             print 'client email is: '+ email
+            #saving the new peer
             usr = User.objects.create_user(name, email, password)
-            usr.save()
+            p = Peer()
+            p.user = usr;
+            p.url = form.cleaned_data['url']
+            p.save()
+            #giving the client a response
+            peernamelist = {}
             userlist = User.objects.all()
+            plist = Peer.objects.all()
+            for individual in plist:
+                print individual.user.username
+                print individual.url
+                peernamelist[individual.user.username] = individual.url
+            print plist
             print userlist
-            return HttpResponse('your info is received')
+            print peernamelist
+            return HttpResponse(json.dumps(peernamelist), content_type="application/json")
     else:
         form = UserInfo()
     return render(request, 'simpleform.html', {'form': form})
