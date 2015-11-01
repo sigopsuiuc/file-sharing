@@ -25,7 +25,9 @@ SECRET_KEY = 'z=!e5kck*f%d+8e-vx@+71ymeyaypq224ew#w&4@l^c^%0fa$+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    ]
 
 
 # Application definition
@@ -103,7 +105,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 #CELERY settings
-BROKER_URL = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+# BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
