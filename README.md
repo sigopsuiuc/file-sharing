@@ -8,21 +8,21 @@ server_side
 This directory contains the server code for authentication. The server uses Django Framework.
 
 ####implemented features:
-* able to receive requests and process requests
-* have an admin page set up
+* peer list is returned on successful login and signup
 
 ####TODO:
-* enable _POST_ request under the protection of csrf in polls/views.py	(__solved__)
-* <s>receive information from requests and store the information in the database for future reference</s>
-* set up authentication procedures.
-* send peer list to peer and receive list from peer(__solved__)
+*
+
 ###ISSUES:
 * need research on embeded authentication method of Django and mysql database(__solved__)
 
 
 ####Testing procedures
-1. file-sharing/testing/connect.py contains the necessary information to send a valid request to the server
-2. `python connect.py` will send the request and receive the response containing the dictionary of peers
+1. `cd testing/`... the tester only works in this directory
+2. `chmod +x tester.sh`
+3. `./tester.sh -s` to start the server
+4. `./tester.sh -signup` to signup as a new user... __the url field need to have__ `http://` __in the front__
+5. `./tester.sh -login` to login as an old user
 
 sharing_client
 -----------------------------------------
@@ -47,4 +47,5 @@ testing
 ------------------------------------------
 This directory is intended for testing purposes
 
-connect.py will send post request to /peerlist/ and receive feedback from localhost
+connect.py:      contains functions for interacting with the server
+tester.sh:      see server_side readme for more information 
