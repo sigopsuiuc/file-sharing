@@ -9,7 +9,7 @@ def setup_socket():
 	Sets up and returns a socket that will allow us to request files
 	"""
 	s = socket.socket()				#Setup a socket connection to port 12345, where the server will be listening
-	host = socket.gethostname()
+	host = socket.gethostbyname(socket.gethostname())
 	port = 12345
 	s.connect((host, port))
 	return s

@@ -31,7 +31,7 @@ def setup_socket():
     Sets up and returns a socket that will allow us to send files
     """
     s = socket.socket()             #Setup a socket connection on port 12345, which we will listen on
-    host = socket.gethostname()
+    host = '0.0.0.0'
     port = 12345
     s.bind((host, port))
     s.listen(5)
