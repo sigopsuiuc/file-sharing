@@ -8,3 +8,10 @@ class Peer(models.Model):
     url = models.CharField(max_length=100)
     def __str__(self):
         return self.user.username
+
+
+class PeerGroup(models.Model):
+    groupname = models.CharField(max_length=32)
+    peers = models.ManyToManyField(Peer) 
+    def __str__(self):
+        return self.groupname
