@@ -105,7 +105,24 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 #CELERY settings
-# BROKER_URL = 'redis://localhost:6379/0'
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Chicago'
+
+#CELERY periodic task settings
+from datetime import timedelta
+
+CELERYBEAT_SCHEDULE = {
+    'malicious-every-10-seconds': {
+        'task': 'malicious_periodic',
+        'schedule': timedelta(seconds=10)
+    },
+
+    'udp_broadcast-every-10-seconds': {
+        'task': 'udp_broadcast',
+        'schedule': timedelta(seconds=10)
+    },
+}

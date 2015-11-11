@@ -2,12 +2,12 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>test template</title>
+        <title>Sign up as peer</title>
 
     </head>
     <body>
 
-        <form action = "peerlist/" method="post">
+        <form method="post">
            {% csrf_token %}
            {{ form }}
            <input type="submit" value ="behold">
