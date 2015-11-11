@@ -59,7 +59,8 @@ def get_response_for_new_user(groupname):
     for individual in plist:
         print individual.user.username
         print individual.url
-        peernamelist[individual.user.username] = individual.url
+        data = (individual.ip_addr, individual.port)
+        peernamelist[individual.user.username] = data
     print plist
     print peernamelist
     return peernamelist
@@ -84,7 +85,8 @@ def get_response_for_old_user(peer):
             groupmembers = {}
             peers = eachgroup.peers.all()
             for eachpeer in peers:
-                groupmembers[eachpeer.user.username] = eachpeer.url
+                data = (eachpeer.ip_addr, eachpeer.port)
+                groupmembers[eachpeer.user.username] = data
             peernamelist[eachgroup.groupname] = groupmembers
 
     print peernamelist

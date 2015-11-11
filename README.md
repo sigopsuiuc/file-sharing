@@ -1,5 +1,12 @@
 # file-sharing
 
+Requirements
+-----------------------------------------
+python 2.7.10
+Redis 3.0.5
+celery v3.1.19
+
+
 server_side
 -----------------------------------------
 
@@ -9,6 +16,7 @@ This directory contains the server code for authentication. The server uses Djan
 
 ####implemented features:
 * peer list is returned on successful login and signup
+* divided peers into groups
 
 ####TODO:
 *
@@ -23,6 +31,17 @@ This directory contains the server code for authentication. The server uses Djan
 3. `./tester.sh -s` to start the server
 4. `./tester.sh -signup` to signup as a new user... __the url field need to have__ `http://` __in the front__
 5. `./tester.sh -login` to login as an old user
+
+####Asynchronous tasks
+https://realpython.com/blog/python/asynchronous-tasks-with-django-and-celery/
+
+lines:
+```
+redis-server
+celery -A picha worker -l info
+celery -A picha beat -l info
+```
+
 
 sharing_client
 -----------------------------------------
@@ -48,4 +67,4 @@ testing
 This directory is intended for testing purposes
 
 connect.py:      contains functions for interacting with the server
-tester.sh:      see server_side readme for more information 
+tester.sh:      see server_side readme for more information

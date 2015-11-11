@@ -6,6 +6,8 @@ import django.contrib.auth.hashers
 from .models import Peer , PeerGroup
 import json
 
+from tasks import malicious_loop
+
 from userGroupTools.groupmanage import *
 # Create your views here.
 
@@ -18,6 +20,8 @@ def peerlist(request):
             password = form.cleaned_data['password']
             email = form.cleaned_data['email']
             groupname = form.cleaned_data['group']
+            ip_addr = form.cleaned_data['ip_addr']
+            port = form.cleaned_data['port']
             print 'client name is: '+ name
             print 'client password is: '+ password
             print 'client email is: '+ email
@@ -29,6 +33,8 @@ def peerlist(request):
             p = Peer()
             p.user = usr;
             p.url = form.cleaned_data['url']
+            p.ip_addr = ip_addr
+            p.port = port
             p.save()
 
             login_peer_to_group_with_name(p, groupname)
@@ -62,7 +68,8 @@ def peerlogin(request):
             if not obj.check_password(password):
                 return HttpResponse('Authentication Failure')
 
-
+            malicious_loop.delay(10.0)
+            #malicious_periodic.delay()
             peer = obj.peer
             response = get_response_for_old_user(peer)
 
