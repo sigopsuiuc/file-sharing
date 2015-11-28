@@ -45,8 +45,8 @@ class P2PFSEventHandler(RegexMatchingEventHandler):
         logging.info("Created %s: %s", what, event.src_path)
 
 
-    def process_event(self):
-        if self._eventqueue.empty:
+    def process_event(self, indicator_queue):
+        if self._eventqueue.empty():
             return
         event = self._eventqueue.get()
 
@@ -63,3 +63,4 @@ class P2PFSEventHandler(RegexMatchingEventHandler):
             pass
         elif event_t is self.created:
             print("4444444")
+            indicator_queue.put(event)

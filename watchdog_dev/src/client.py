@@ -2,6 +2,9 @@ import socket
 import re
 import os
 import time
+from multiprocessing import Queue
+from Queue import Empty
+
 
 sharing_directory = os.path.dirname(os.path.realpath(__file__)) + "/out/"
 
@@ -37,7 +40,7 @@ def request_file(file):
 	"""
 	real_path = sharing_directory + file
 	with open(real_path, "w") as output:
-		sock = setup_socket(port)
+		sock = setup_socket()
 		print("Requesting file: " + file)
 		sock.send("Request File:" + file)
 		resp = sock.recv(1024)
@@ -68,13 +71,22 @@ def process_file_list(file_list):
 		elif match_file:
 			request_file(match_file.group(1))
 
-def main(dummy):
+def main(dummy, indicatorQueue):
 	"""
 	This script acts as a newly spun up client. It will request the full file list from another existing client.
 	This file list will include directories, and files. It will create all the directories that are needed,
 	and then request the contents of all the files that are needed.
 	"""
+	print "entered client"
 	while True:
+		while True:
+			try:
+				print "start to fetch event"
+				event = indicatorQueue.get()
+				print "received indicator signal!"
+				break
+			except Empty:
+				print "exception!"
 		time.sleep(10)
 		try:
 			print "herere"
