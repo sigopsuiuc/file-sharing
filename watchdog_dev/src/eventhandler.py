@@ -1,6 +1,6 @@
 from watchdog.events import LoggingEventHandler, RegexMatchingEventHandler
 import logging
-from Queue import Queue
+from multiprocessing import Queue
 
 class P2PFSEventHandler(RegexMatchingEventHandler):
 
@@ -45,18 +45,22 @@ class P2PFSEventHandler(RegexMatchingEventHandler):
         logging.info("Created %s: %s", what, event.src_path)
 
 
-    def process_event(self):
-        if self._eventqueue.empty:
+    def process_event(self, indicator_queue):
+        if self._eventqueue.empty():
             return
         event = self._eventqueue.get()
 
         event_t = event.event_type
         if event_t is self.deleted:
-            print("1111111")
+            #print("1111111")
+            pass
         elif event_t is self.modified:
             if not event.is_directory:
-                print("2222222")
+                #print("2222222")
+                pass
         elif event_t is self.moved:
-            print("3333333")
+            #print("3333333")
+            pass
         elif event_t is self.created:
             print("4444444")
+            indicator_queue.put(event)
