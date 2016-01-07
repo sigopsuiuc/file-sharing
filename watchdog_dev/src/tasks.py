@@ -1,15 +1,19 @@
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Manager
 from eventhandler import P2PFSEventHandler
-
+from messenger import Messenger
 
 
 class Coordinator:
 
-    def __init__(self, event_handler, connector):
+    def __init__(self, event_handler, connector, remote_port, receiverport, peer_group_dict):
         self.tcp_busy = False
         self._event_handler = event_handler
         self.indicator = connector.indicator
         self.connector = connector
+        self.debug_remote_port = remote_port
+        self.peer_group_dict = peer_group_dict
+        self.receiverport = receiverport
+
         #self._tcp_lock = Lock()
 
 
@@ -22,7 +26,9 @@ class Coordinator:
             return
 
         #check the event queue
-        self._event_handler.process_event(self.indicator.debug_eventqueue)
+        #if self.peer_group_dict:
+        #    print self.peer_group_dict
+        self._event_handler.process_event(self.peer_group_dict, self.receiverport)
         #update the files(send out files)
 
 
@@ -45,24 +51,32 @@ class Coordinator:
 
 class Connector:
 
-    def __init__(self, client, server, senderport, receiverport, indicator):
-        self.clientProcess = Process(target = client, args=(senderport, indicator.debug_eventqueue,))
+    def __init__(self, client, server, senderport, receiverport, messenger_port, indicator, sharing_directory, peer_group_dict):
+        self.clientProcess = Process(target = client, args=(senderport, indicator.debug_eventqueue, sharing_directory, ))
         self.clientProcess.daemon = True
-        self.serverProcess = Process(target = server, args=(receiverport,))
+        self.serverProcess = Process(target = server, args=(receiverport, sharing_directory, indicator.debug_eventqueue, ))
         self.serverProcess.daemon = True
         self.indicator = indicator
+        self.my_messenger = Messenger(messenger_port, peer_group_dict)
+        self.messengerProcess = Process(target = self.my_messenger.process, args=(indicator.debug_eventqueue, ))
+        self.messengerProcess.daemon = True
+
 
     def start(self):
         self.clientProcess.start()
         self.serverProcess.start()
+        self.messengerProcess.start()
 
     def terminate(self):
         self.clientProcess.terminate()
         self.serverProcess.terminate()
+        self.messengerProcess.terminate()
+
 
     def join(self):
         self.clientProcess.join()
         self.serverProcess.join()
+        self.messengerProcess.join()
 
 class Indicator:
 

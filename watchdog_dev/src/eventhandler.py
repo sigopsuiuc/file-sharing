@@ -1,6 +1,8 @@
 from watchdog.events import LoggingEventHandler, RegexMatchingEventHandler
 import logging
 from multiprocessing import Queue
+import socket
+import json
 
 class P2PFSEventHandler(RegexMatchingEventHandler):
 
@@ -45,7 +47,7 @@ class P2PFSEventHandler(RegexMatchingEventHandler):
         logging.info("Created %s: %s", what, event.src_path)
 
 
-    def process_event(self, indicator_queue):
+    def process_event(self, remote_socket_dict, local_port):
         if self._eventqueue.empty():
             return
         event = self._eventqueue.get()
@@ -63,4 +65,19 @@ class P2PFSEventHandler(RegexMatchingEventHandler):
             pass
         elif event_t is self.created:
             print("4444444")
-            indicator_queue.put(event)
+            #TODO: What we really want to do here is to send a TCP notification
+            #      to All the peers
+            for (key, value) in remote_socket_dict.items():
+                try:
+                    event_l = [event.event_type, event.is_directory, event.src_path, '127.0.0.1', local_port]
+                    event_sent = json.dumps(event_l)
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.connect((value[0], value[1]))
+                    s.send("event: " + event_sent)
+                    s.close()
+                except socket.error as msg:
+                    print "socket error in eventhandler " + msg
+                    continue
+
+
+            #indicator_queue.put(event)
