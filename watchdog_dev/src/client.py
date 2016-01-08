@@ -34,7 +34,24 @@ def request_file_list(port):
 	sock.close()
 	return file_list
 
-def request_file(file):
+def request_file_list_socket(remote_socket_tuple):
+	"""
+	Creates a socket to one of the other clients and requests the file list
+	"""
+	remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	remote_socket.connect(remote_socket_tuple)
+	#not yet finished
+	print('Requesting File List')
+	remote_socket.send("Send Files")
+	resp = remote_socket.recv(1024)
+	file_list = resp
+	while resp:
+		resp = remote_socket.recv(1024)
+		file_list += resp
+	remote_socket.close()
+	return file_list
+
+def request_file(file, sharing_directory):
 	"""
 	Request the given file from another server and saves the file to disk
 	"""
@@ -49,7 +66,27 @@ def request_file(file):
 			resp = sock.recv(1024)
 		sock.close()
 
-def create_directory(directory):
+def request_file_socket(file, remote_socket_tuple, sharing_directory):
+	"""
+	Request the given file from another server and saves the file to disk
+	"""
+
+	real_path = sharing_directory + file
+	with open(real_path, "w") as output:
+		remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		remote_socket.connect(remote_socket_tuple)
+		#sock = setup_socket()
+		print("Requesting file: " + file)
+		remote_socket.send("Request File:" + file)
+		resp = remote_socket.recv(1024)
+		while(resp):
+			output.write(resp)
+			resp = remote_socket.recv(1024)
+		remote_socket.close()
+
+
+
+def create_directory(directory, sharing_directory):
 	"""
 	Creates the specified directory within the shared folder
 	"""
@@ -58,7 +95,7 @@ def create_directory(directory):
 	if not os.path.exists(real_path):
 		os.makedirs(real_path)
 
-def process_file_list(file_list):
+def process_file_list(file_list, sharing_directory):
 	"""
 	Parses the given file list. It goes through each item in the list. If the item is a directory,
 	then that directory is made within the sharing folder. If its a file, then that file is requested from another client
@@ -67,16 +104,29 @@ def process_file_list(file_list):
 		match = re.match("Directory:(.+)", line)
 		match_file = re.match("File:(.+)", line)
 		if match != None:
-			create_directory(match.group(1))
+			create_directory(match.group(1), sharing_directory)
 		elif match_file:
-			request_file(match_file.group(1))
+			request_file(match_file.group(1), sharing_directory)
 
-def main(dummy, indicatorQueue):
+
+
+def process_file_list_socket(file_list, remote_socket_tuple, sharing_directory):
 	"""
-	This script acts as a newly spun up client. It will request the full file list from another existing client.
-	This file list will include directories, and files. It will create all the directories that are needed,
-	and then request the contents of all the files that are needed.
+	Parses the given file list. It goes through each item in the list. If the item is a directory,
+	then that directory is made within the sharing folder. If its a file, then that file is requested from another client
 	"""
+	for line in file_list.split("\n"):
+		match = re.match("Directory:(.+)", line)
+		match_file = re.match("File:(.+)", line)
+		if match != None:
+			create_directory(match.group(1), sharing_directory)
+		elif match_file:
+			request_file_socket(match_file.group(1), remote_socket_tuple, sharing_directory)
+def main(dummy, indicatorQueue, sharing_directory):
+	"""
+
+	"""
+
 	print "entered client"
 	while True:
 		while True:
@@ -84,16 +134,18 @@ def main(dummy, indicatorQueue):
 				print "start to fetch event"
 				event = indicatorQueue.get()
 				print "received indicator signal!"
+				print event
 				break
 			except Empty:
 				print "exception!"
-		time.sleep(10)
+		time.sleep(2)
 		try:
 			print "herere"
-			file_list = request_file_list(dummy)
-			process_file_list(file_list)
-		except:
-			print 'connection exception'
+			remote_socket_tuple = (event[3], event[4])
+			file_list = request_file_list_socket(remote_socket_tuple)
+			process_file_list_socket(file_list, remote_socket_tuple, sharing_directory)
+		except socket.error as msg:
+			print 'connection exception: ' + msg
 			continue
 
 if __name__ == "__main__":

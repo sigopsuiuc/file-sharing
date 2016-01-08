@@ -35,23 +35,29 @@ def begin_broadcast():
     if not groups:
         return
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
     for eachgroup in groups:
         peers = get_all_peers_in_group(eachgroup)
         '''continue to the next group if there is no peer'''
         if not peers:
             continue
+            
         data = get_data(eachgroup)
         msg = json.dumps(data)
 
         for eachpeer in peers:
-            udp_ip = eachpeer.ip_addr
-            udp_port = eachpeer.port
+            tcp_ip = eachpeer.ip_addr
+            tcp_port = eachpeer.port
             try:
-                sock.sendto('Hello This is the server', (udp_ip, udp_port))
-                sock.sendto(msg, (udp_ip, udp_port))
-            except:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect((tcp_ip, tcp_port))
+                sock.sendall('Hello This is the server')
+                sock.sendall(msg)
+                sock.close()
+            except socket.error as msg:
                 print"sock error"
+                print tcp_ip +" "+ str(tcp_port)
+                print msg
                 continue
 
 

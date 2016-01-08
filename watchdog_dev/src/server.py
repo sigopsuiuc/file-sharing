@@ -1,10 +1,10 @@
 import socket
 import os
 import re
+import json
+#sharing_directory = os.path.dirname(os.path.realpath(__file__)) + "/in/"
 
-sharing_directory = os.path.dirname(os.path.realpath(__file__)) + "/in/"
-
-def get_file_list():
+def get_file_list(sharing_directory):
     """
     Generates a list of directories and files in the shared folder
     """
@@ -32,12 +32,12 @@ def setup_socket(port = 12345):
     """
     s = socket.socket()             #Setup a socket connection on port 12345, which we will listen on
     host = '0.0.0.0'
-    #port = 12345
+
     s.bind((host, port))
     s.listen(5)
     return s
 
-def main(port = 12345):
+def main(port = 12345, sharing_directory = '.'):
     """
     This will bind itself to a port and listen for any incoming connections
     """
@@ -61,17 +61,17 @@ def main(port = 12345):
                     resp = file_content.read(1024)
         conn.close()
 
-def listener(port = 12345):
+def listener(port = 12345, sharing_directory = '.', indicatorQueue = None):
     """
     This will bind itself to a port and listen for any incoming connections
     """
     sock = setup_socket(port)
     while True:
         conn, addr = sock.accept()
-        req = conn.recv(1024)
+        req = conn.recv(4096)
         if req == "Send Files":             #Send out the complete file list if a client requests it
             print("Sending out file_list")
-            file_list = get_file_list()
+            file_list = get_file_list(sharing_directory)
             conn.send(file_list)
         elif "Request File" in req:         #Send out a file if a client requests it
              match_file = re.match("Request File:(.+)", req)
@@ -83,6 +83,22 @@ def listener(port = 12345):
                 while resp:
                     conn.send(resp)
                     resp = file_content.read(1024)
+        elif "event" in req:
+
+            received = ""
+            try:
+                while (req):
+                    received = received + req
+                    req = conn.recv(4096)
+                print received
+
+                event_str = received[7:]
+                event = json.loads(event_str)
+                indicatorQueue.put(event)
+            except socket.error:
+                print "socket error in listener"
+
+
         conn.close()
 
 
