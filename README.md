@@ -38,8 +38,8 @@ https://realpython.com/blog/python/asynchronous-tasks-with-django-and-celery/
 lines:
 ```
 redis-server
-celery -A picha worker -l info
-celery -A picha beat -l info
+celery -A server_side worker -l info
+celery -A server_side beat -l info
 ```
 
 
