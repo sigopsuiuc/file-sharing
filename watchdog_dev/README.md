@@ -23,11 +23,11 @@ in in field __port__
 
 ##Step 3
 go to watchdog_dev/src
-python main.py <directory inside testfield> <listener_port> <sender_port(not in use but you have to fill in)> <messenger_port>
+python main.py <directory inside testfield> <listener_port> <messenger_port>
 will start client program
 e.g.
-`python main.py 12 11223 33221 33333` will let the watchdog check testfield/12
-start a listener to send files to other client on 11223 and a listener on 33333 to
+`python main.py 12 33221 33333` will let the watchdog check testfield/12
+start a listener to send files to other client on 33221 and a listener on 33333 to
 exchange messages or commands with the server and the other clients
 
 the value of messenger_port should be the same as the value you filled in __port__ when you logged on
@@ -36,5 +36,5 @@ ISSUES
 ---------------------------
 1. Client only respond if the other client has a newly created file or directory
 2. Client will ask for all the files and directories once it knows other client has a
-    newly created file
+    newly created file __SOLVED__
 3. The code now only works when ip is 127.0.0.1
