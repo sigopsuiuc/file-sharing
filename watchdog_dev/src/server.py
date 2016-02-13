@@ -2,7 +2,9 @@ import socket
 import os
 import re
 import json
-#sharing_directory = os.path.dirname(os.path.realpath(__file__)) + "/in/"
+
+# sharing_directory = os.path.dirname(os.path.realpath(__file__)) + "/in/"
+
 
 def get_file_list(sharing_directory):
     """
@@ -26,7 +28,7 @@ def get_file_list(sharing_directory):
     return filelist
 
 
-def setup_socket(port = 12345):
+def setup_socket(port=12345):
     """
     Sets up and returns a socket that will allow us to send files
     """

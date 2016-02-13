@@ -76,7 +76,7 @@ def request_file(file, sharing_directory):
 			resp = sock.recv(1024)
 		sock.close()
 
-def request_file_socket(file, remote_socket_tuple, sharing_directory, database_directory, check_sum):
+def request_file_socket(file, remote_socket_tuple, sharing_directory, database_directory, timestamp):
 	"""
 	Request the given file from another server and saves the file to disk
 	"""
@@ -90,7 +90,7 @@ def request_file_socket(file, remote_socket_tuple, sharing_directory, database_d
 		r = cursor.fetchall()
 		if len(r) >= 1:
 			item = r[0]
-			if item[1] == check_sum:
+			if item[1] == timestamp:
 				conn.close()
 				return
 		conn.close()
@@ -180,13 +180,13 @@ def main(indicatorQueue, sharing_directory, database_directory):
 			remote_socket_tuple = (event[3], event[4])
 			is_directory = event[1]
 			path = event[2]
-			check_sum = event[6]
+			timestamp = float(event[6])
 
 			if is_directory:
 				create_directory(path, sharing_directory)
 			else:
 				request_file_socket(path, remote_socket_tuple, sharing_directory,
-				database_directory, check_sum)
+				database_directory, timestamp)
 
 		except socket.error as msg:
 			print 'connection exception: ' + msg
