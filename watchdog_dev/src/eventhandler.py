@@ -7,17 +7,18 @@ import sqlite3
 import os
 import hashlib
 import datetime
+import time
 
 class P2PFSEventHandler(RegexMatchingEventHandler):
 
-#ignore_regexes=['^.+?\.sw.?$']
+    # ignore_regexes=['^.+?\.sw.?$']
     deleted = "deleted"
     modified = "modified"
     moved = "moved"
     created = "created"
 
     def __init__(self, metadata_dir, sharing_dir, user):
-        super(P2PFSEventHandler, self).__init__(ignore_regexes=['^.+?\.sw.?$']) #ignore temporary files
+        super(P2PFSEventHandler, self).__init__(ignore_regexes=['^.+?\.sw.?$'])  #ignore temporary files
         self._eventqueue = Queue()
         self.sharing_dir = sharing_dir
         dir_db = metadata_dir + '/peers.db'
@@ -69,7 +70,6 @@ class P2PFSEventHandler(RegexMatchingEventHandler):
         what = 'directory' if event.is_directory else 'file'
         logging.info("Created %s: %s", what, event.src_path)
 
-
     def process_event(self, local_port):
         if self._eventqueue.empty():
             return
@@ -90,14 +90,16 @@ class P2PFSEventHandler(RegexMatchingEventHandler):
             print("4444444")
             #TODO: get time, and number
             today = str(datetime.date.today())
-            check_sum = self.md5(event.src_path)
+            # check_sum = self.md5(event.src_path)
+            timestamp = time.time()
             path = event.src_path.replace(self.sharing_dir, "")
             event_l = [event.event_type, event.is_directory, path, '127.0.0.1',
-                        local_port, today, check_sum]
+                       local_port, today, timestamp]
             print event_l
             conn = sqlite3.connect(self.metadata_dir + '/files.db')
             cursor = conn.cursor()
-            cursor.execute("INSERT OR REPLACE INTO files (dir, md5) VALUES (?,?)", (path, check_sum))
+            # TODO: We need to change here
+            cursor.execute("INSERT OR REPLACE INTO files (dir, time) VALUES (?,?)", (path, timestamp))
             conn.commit()
             conn.close()
 

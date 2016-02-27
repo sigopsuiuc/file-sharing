@@ -30,7 +30,7 @@ def check_file_database(metadata_dir):
     cursor = conn.cursor()
     if not flag:
         cursor.execute('''CREATE TABLE files
-                            (dir text, md5 text, PRIMARY KEY(dir DESC))''')
+                            (dir text, time REAL, PRIMARY KEY(dir DESC))''')
         conn.commit()
 
     conn.close()
