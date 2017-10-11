@@ -20,7 +20,7 @@ def request_file_list():
 	"""
 	sock = setup_socket()
 	print('Requesting File List')
-	sock.send("Send Files")
+	sock.send("Send Files".encode())
 	resp = sock.recv(1024)
 	file_list = resp
 	while resp:
@@ -37,10 +37,10 @@ def request_file(file):
 	with open(real_path, "w") as output:
 		sock = setup_socket()
 		print("Requesting file: " + file)
-		sock.send("Request File:" + file)
+		sock.send(("Request File:" + file).encode())
 		resp = sock.recv(1024)
 		while(resp):
-			output.write(resp)
+			output.write(resp.decode())
 			resp = sock.recv(1024)
 		sock.close()
 
@@ -55,10 +55,10 @@ def create_directory(directory):
 
 def process_file_list(file_list):
 	"""
-	Parses the given file list. It goes through each item in the list. If the item is a directory, 
+	Parses the given file list. It goes through each item in the list. If the item is a directory,
 	then that directory is made within the sharing folder. If its a file, then that file is requested from another client
 	"""
-	for line in file_list.split("\n"):
+	for line in file_list.decode().split("\n"):
 		match = re.match("Directory:(.+)", line)
 		match_file = re.match("File:(.+)", line)
 		if match != None:
@@ -68,8 +68,8 @@ def process_file_list(file_list):
 
 def main():
 	"""
-	This script acts as a newly spun up client. It will request the full file list from another existing client. 
-	This file list will include directories, and files. It will create all the directories that are needed, 
+	This script acts as a newly spun up client. It will request the full file list from another existing client.
+	This file list will include directories, and files. It will create all the directories that are needed,
 	and then request the contents of all the files that are needed.
 	"""
 	file_list = request_file_list()
@@ -77,4 +77,3 @@ def main():
 
 if __name__ == "__main__":
     main()
- 

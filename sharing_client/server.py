@@ -13,7 +13,7 @@ def get_file_list():
     for (dirpath, dirnames, filenames) in os.walk(sharing_directory):       #Recursively go through all the directories in the sharing directory
         dirpath = dirpath.replace(sharing_directory, "")        #Get the inner directory path within the sharing directory
         for directory in dirnames:
-            if dirpath == "":                                   
+            if dirpath == "":
                 directories.append("Directory:" + directory)        #Add the path to each directory within the sharing directory to the directories list
             else:
                 directories.append("Directory:" + dirpath + "/" + directory)        #Add the path to each directory within the sharing directory to the directories list
@@ -45,19 +45,19 @@ def main():
     while True:
         conn, addr = sock.accept()
         req = conn.recv(1024)
-        if req == "Send Files":             #Send out the complete file list if a client requests it
+        if req == "Send Files".encode():             #Send out the complete file list if a client requests it
             print("Sending out file_list")
             file_list = get_file_list()
-            conn.send(file_list)
-        elif "Request File" in req:         #Send out a file if a client requests it
-             match_file = re.match("Request File:(.+)", req)        
+            conn.send(file_list.encode())
+        elif "Request File".encode() in req:         #Send out a file if a client requests it
+             match_file = re.match("Request File:(.+)", req.decode())
              file = match_file.group(1)
              print("Sending out: " + file)
              real_path = sharing_directory + file
              with open(real_path, "r") as file_content:
                 resp = file_content.read(1024)
                 while resp:
-                    conn.send(resp)
+                    conn.sendall(resp.encode())
                     resp = file_content.read(1024)
         conn.close()
 
